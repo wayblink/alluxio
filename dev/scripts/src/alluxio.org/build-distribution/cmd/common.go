@@ -31,7 +31,7 @@ var hadoopDistributions = map[string]version{
 	"hadoop-2.3": parseVersion("2.3.0"),
 	"hadoop-2.4": parseVersion("2.4.1"),
 	"hadoop-2.5": parseVersion("2.5.2"),
-	"hadoop-2.6": parseVersion("2.6.5"),
+	"hadoop-2.6": parseVersion("2.6.0-cdh5.4.4-bd3"),
 	"hadoop-2.7": parseVersion("2.7.3"),
 	"hadoop-2.8": parseVersion("2.8.0"),
 	"hadoop-2.9": parseVersion("2.9.0"),
