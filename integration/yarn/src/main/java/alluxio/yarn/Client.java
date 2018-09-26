@@ -189,6 +189,26 @@ public final class Client {
     new HelpFormatter().printHelp("Client", mOptions);
   }
 
+  String printTrack(){
+    StringBuffer sbf =new StringBuffer();
+    StackTraceElement[] st = Thread.currentThread().getStackTrace();
+    if(st==null){
+      sbf.append("无堆栈...");
+      return sbf.toString();
+    }
+    for(StackTraceElement e:st){
+      if(sbf.length()>0){
+        sbf.append(" <- ");
+        sbf.append(System.getProperty("line.separator"));
+      }
+      sbf.append(java.text.MessageFormat.format("{0}.{1}() {2}"
+              ,e.getClassName()
+              ,e.getMethodName()
+              ,e.getLineNumber()));
+    }
+    return sbf.toString();
+  }
+
   /**
    * Parses command line options.
    *
@@ -197,6 +217,8 @@ public final class Client {
    * @throws ParseException if an error occurs when parsing the argument
    */
   private boolean parseArgs(String[] args) throws ParseException {
+    printTrack();
+    LOG.info(Integer.toString(args.length));
     Preconditions.checkArgument(args.length > 0, "No args specified for client to initialize");
     CommandLine cliParser = new GnuParser().parse(mOptions, args);
 
@@ -212,9 +234,9 @@ public final class Client {
 
     mResourcePath = cliParser.getOptionValue("resource_path");
     mMasterAddress = cliParser.getOptionValue("master_address");
-    mAppName = cliParser.getOptionValue("appname", "Alluxio");
+    mAppName = cliParser.getOptionValue("appname", "alluxio_" + System.currentTimeMillis() +"_wanganyang");
     mAmPriority = Integer.parseInt(cliParser.getOptionValue("priority", "0"));
-    mAmQueue = cliParser.getOptionValue("queue", "default");
+    mAmQueue = cliParser.getOptionValue("queue", "root.data.etl");
     mAmMemoryInMB = Integer.parseInt(cliParser.getOptionValue("am_memory", "1024"));
     mAmVCores = Integer.parseInt(cliParser.getOptionValue("am_vcores", "1"));
     mNumWorkers = Integer.parseInt(cliParser.getOptionValue("num_workers", "1"));
