@@ -219,8 +219,12 @@ public final class Client {
    */
   private boolean parseArgs(String[] args) throws ParseException {
     Log.info(printTrack());
-    LOG.info("args num : " + Integer.toString(args.length));
+    Log.info("args num : " + Integer.toString(args.length));
+    for (int i = 0; i < args.length; i++){
+      Log.info(args[i]);
+    }
     Preconditions.checkArgument(args.length > 0, "No args specified for client to initialize");
+    Log.info("flag0");
     CommandLine cliParser = new GnuParser().parse(mOptions, args);
 
     Log.info("flag1");
