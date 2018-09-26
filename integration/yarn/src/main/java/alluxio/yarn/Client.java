@@ -51,6 +51,7 @@ import org.apache.hadoop.yarn.exceptions.YarnException;
 import org.apache.hadoop.yarn.util.Apps;
 import org.apache.hadoop.yarn.util.ConverterUtils;
 import org.apache.hadoop.yarn.util.Records;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,10 +218,12 @@ public final class Client {
    * @throws ParseException if an error occurs when parsing the argument
    */
   private boolean parseArgs(String[] args) throws ParseException {
-    printTrack();
-    LOG.info(Integer.toString(args.length));
+    Log.info(printTrack());
+    LOG.info("args num : " + Integer.toString(args.length));
     Preconditions.checkArgument(args.length > 0, "No args specified for client to initialize");
     CommandLine cliParser = new GnuParser().parse(mOptions, args);
+
+    Log.info("flag1");
 
     if (cliParser.hasOption("help")) {
       printUsage();
@@ -231,6 +234,8 @@ public final class Client {
       printUsage();
       return false;
     }
+
+    Log.info("flag2");
 
     mResourcePath = cliParser.getOptionValue("resource_path");
     mMasterAddress = cliParser.getOptionValue("master_address");
@@ -243,12 +248,16 @@ public final class Client {
     mMaxWorkersPerHost =
         Configuration.getInt(PropertyKey.INTEGRATION_YARN_WORKERS_PER_HOST_MAX);
 
+    Log.info("flag3");
+
     Preconditions.checkArgument(mAmMemoryInMB > 0,
         "Invalid memory specified for application master, " + "exiting. Specified memory="
             + mAmMemoryInMB);
     Preconditions.checkArgument(mAmVCores > 0,
         "Invalid virtual cores specified for application master, exiting."
             + " Specified virtual cores=" + mAmVCores);
+
+    Log.info("flag4");
     return true;
   }
 
