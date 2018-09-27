@@ -6,7 +6,7 @@ set -x
 
 rm -rf output
 
-rm -rf ~/.m2/settings.xml
+#rm -rf ~/.m2/settings.xml
 
 # http proxy
 #export http_proxy="http://10.4.16.31:3128"

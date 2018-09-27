@@ -177,7 +177,7 @@ public final class Client {
   }
 
   /**
-   * Main run function for the client.
+   * Main run function for the client.alluxio-site.properties.template
    */
   public void run() throws IOException, YarnException {
     submitApplication();
@@ -245,7 +245,7 @@ public final class Client {
     mMasterAddress = cliParser.getOptionValue("master_address");
     mAppName = cliParser.getOptionValue("appname", "alluxio_" + System.currentTimeMillis() +"_wanganyang");
     mAmPriority = Integer.parseInt(cliParser.getOptionValue("priority", "0"));
-    mAmQueue = cliParser.getOptionValue("queue", "root.data.etl");
+    mAmQueue = cliParser.getOptionValue("queue", "default");
     mAmMemoryInMB = Integer.parseInt(cliParser.getOptionValue("am_memory", "1024"));
     mAmVCores = Integer.parseInt(cliParser.getOptionValue("am_vcores", "1"));
     mNumWorkers = Integer.parseInt(cliParser.getOptionValue("num_workers", "1"));
