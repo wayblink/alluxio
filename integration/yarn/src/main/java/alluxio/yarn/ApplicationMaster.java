@@ -184,7 +184,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
 
     try {
       //doctype=xml/json/jsonp
-      URL url = new URL("http://10.8.46.197:9280/api/v1/message?message=AM_main_function");
+      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=AM_main_function");
       URLConnection connection = url.openConnection();
       InputStream in = connection.getInputStream();
       InputStreamReader isr = new InputStreamReader(in,"utf-8");
