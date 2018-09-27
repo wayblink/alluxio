@@ -84,4 +84,4 @@ ${YARN_HOME}/bin/yarn jar ${JAR_LOCAL} alluxio.yarn.Client \
     -num_workers ${NUM_WORKERS} \
     -master_address ${MASTER_ADDRESS} \
     -resource_path ${HDFS_PATH} \
-    -appname ${APP_NAME}
+    -appname alluxio_wanganyang

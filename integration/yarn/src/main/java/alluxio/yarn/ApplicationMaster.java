@@ -182,7 +182,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
    */
   public static void main(String[] args) throws InterruptedException {
 
-    Thread.sleep(10000000);
+//    Thread.sleep(10000000);
     Options options = new Options();
     options.addOption("num_workers", true, "Number of Alluxio workers to launch. Default 1");
     options.addOption("master_address", true, "(Required) Address to run Alluxio master");
