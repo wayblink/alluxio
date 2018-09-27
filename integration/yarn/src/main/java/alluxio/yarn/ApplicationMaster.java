@@ -49,11 +49,11 @@ import org.apache.hadoop.yarn.util.Records;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.InetAddress;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
 import java.util.Arrays;
@@ -181,6 +181,31 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
    * @param args Command line arguments to launch application master
    */
   public static void main(String[] args) throws InterruptedException {
+
+    try {
+      //doctype=xml/json/jsonp
+      URL url = new URL("http://10.8.46.197:9280/api/v1/message");
+      URLConnection connection = url.openConnection();
+      InputStream in = connection.getInputStream();
+      InputStreamReader isr = new InputStreamReader(in,"utf-8");
+      BufferedReader br = new BufferedReader(isr);
+      String line;
+      StringBuilder sb = new StringBuilder();
+      while((line = br.readLine()) != null)
+      {
+        sb.append(line);
+      }
+      br.close();
+      isr.close();
+      in.close();
+      System.out.println(sb.toString());
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
 
 //    Thread.sleep(10000000);
     Options options = new Options();
