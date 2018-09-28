@@ -26,6 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -101,13 +105,28 @@ public final class ContainerAllocator {
     return unusedHosts.toArray(new String[] {});
   }
 
+  public static void sendMessage(String message){
+    try {
+      //doctype=xml/json/jsonp
+      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
+      URLConnection connection = url.openConnection();
+      InputStream in = connection.getInputStream();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Allocates the containers specified by the constructor.
    *
    * @return the allocated containers
    */
   public List<Container> allocateContainers() throws Exception {
+    sendMessage("ContainerAllocator.allocateContainers");
     for (int attempt = 0; attempt < MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS; attempt++) {
+      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers");
       LOG.debug("Attempt {} of {} to allocate containers",
           attempt, MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS);
       int numContainersToRequest = mTargetNumContainers - mAllocatedContainerHosts.size();
@@ -120,7 +139,10 @@ public final class ContainerAllocator {
         break;
       }
     }
+    sendMessage("ContainerAllocator.allocateContainers.afterfor");
+    sendMessage("ContainerAllocator.allocateContainers" + mAllocatedContainers.size());
     if (mAllocatedContainers.size() != mTargetNumContainers) {
+      sendMessage("ContainerAllocator.allocateContainers.throw");
       throw new RuntimeException(String.format("Failed to allocate %d %s containers",
           mTargetNumContainers, mContainerName));
     }

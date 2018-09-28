@@ -218,7 +218,7 @@ public final class Client {
    * @throws ParseException if an error occurs when parsing the argument
    */
   private boolean parseArgs(String[] args) throws ParseException {
-    Log.info(printTrack());
+//    Log.info(printTrack());
     Log.info("args num : " + Integer.toString(args.length));
     for (int i = 0; i < args.length; i++){
       Log.info(args[i]);
