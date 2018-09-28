@@ -126,11 +126,13 @@ public final class ContainerAllocator {
   public List<Container> allocateContainers() throws Exception {
     sendMessage("ContainerAllocator.allocateContainers");
     sendMessage(Integer.toString(MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS));
+
     for (int attempt = 0; attempt < MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS; attempt++) {
       sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers1");
       LOG.debug("Attempt {} of {} to allocate containers",
           attempt, MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS);
       int numContainersToRequest = mTargetNumContainers - mAllocatedContainerHosts.size();
+      sendMessage(Integer.toString(numContainersToRequest));
       LOG.debug("Requesting {} containers", numContainersToRequest);
       mOutstandingContainerRequestsLatch = new CountDownLatch(numContainersToRequest);
       sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers2");
@@ -170,6 +172,7 @@ public final class ContainerAllocator {
 
   private void requestContainers() throws Exception {
     sendMessage("ContainerAllocator.requestContainers1");
+    sendMessage(Long.toString(mOutstandingContainerRequestsLatch.getCount()));
     String[] hosts;
     boolean relaxLocality;
     // YARN requires that priority for relaxed-locality requests is different from strict-locality.
@@ -205,5 +208,6 @@ public final class ContainerAllocator {
       mRMClient.addContainerRequest(containerRequest);
     }
     sendMessage("ContainerAllocator.requestContainers5");
+    sendMessage(Long.toString(mOutstandingContainerRequestsLatch.getCount()));
   }
 }
