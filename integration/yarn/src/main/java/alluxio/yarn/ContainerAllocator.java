@@ -158,6 +158,7 @@ public final class ContainerAllocator {
    * @param container the container which has been allocated by YARN
    */
   public synchronized void allocateContainer(Container container) {
+    sendMessage("ContainerAllocator.allocateContainer");
     String containerHost = container.getNodeId().getHost();
     if (mAllocatedContainerHosts.count(containerHost) < mMaxContainersPerHost
         && mAllocatedContainerHosts.size() < mTargetNumContainers) {

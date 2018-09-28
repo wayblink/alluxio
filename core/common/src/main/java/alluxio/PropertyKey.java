@@ -1321,7 +1321,7 @@ public final class PropertyKey implements Comparable<PropertyKey> {
           .build();
   public static final PropertyKey MASTER_WEB_PORT =
       new Builder(Name.MASTER_WEB_PORT)
-          .setDefaultValue(19999)
+          .setDefaultValue(59575)
           .setDescription("The port Alluxio web UI runs on.")
           .setConsistencyCheckLevel(ConsistencyCheckLevel.WARN)
           .setScope(Scope.MASTER)

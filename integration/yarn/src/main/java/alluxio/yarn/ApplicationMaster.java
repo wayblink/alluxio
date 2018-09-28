@@ -191,33 +191,10 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     }
   }
 
-//  private static class MessageThread extends Thread {
-//    String name;
-//
-//    public MessageThread(String name) {
-//      this.name = name;
-//    }
-//
-//    //重写run方法
-//    public void run() {
-//      while (true) {
-//        try {
-//          Thread.sleep(10);
-//        } catch (InterruptedException e) {
-//          e.printStackTrace();
-//        }
-//        sendMessage("ApplicationMaster.main still alive");
-//      }
-//    }
-//  }
-
-
   /**
    * @param args Command line arguments to launch application master
    */
   public static void main(String[] args) throws InterruptedException {
-//    MessageThread mt = new MessageThread("ApplicationMaster MessageThread");
-//    mt.run();
     sendMessage("ApplicationMaster.main");
 //    Thread.sleep(10000000);
     Options options = new Options();
@@ -279,6 +256,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
 
   @Override
   public void onContainersAllocated(List<Container> containers) {
+    sendMessage("ApplicationMaster.onContainersAllocated");
     for (Container container : containers) {
       mContainerAllocator.allocateContainer(container);
     }
