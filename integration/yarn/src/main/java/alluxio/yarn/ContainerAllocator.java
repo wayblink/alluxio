@@ -125,15 +125,17 @@ public final class ContainerAllocator {
    */
   public List<Container> allocateContainers() throws Exception {
     sendMessage("ContainerAllocator.allocateContainers");
-    sendMessage("ContainerAllocator.allocateContainers");
+    sendMessage(Integer.toString(MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS));
     for (int attempt = 0; attempt < MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS; attempt++) {
-      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers");
+      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers1");
       LOG.debug("Attempt {} of {} to allocate containers",
           attempt, MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS);
       int numContainersToRequest = mTargetNumContainers - mAllocatedContainerHosts.size();
       LOG.debug("Requesting {} containers", numContainersToRequest);
       mOutstandingContainerRequestsLatch = new CountDownLatch(numContainersToRequest);
+      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers2");
       requestContainers();
+      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers3");
       // Wait for all outstanding requests to be responded to before beginning the next round.
       mOutstandingContainerRequestsLatch.await();
       if (mAllocatedContainerHosts.size() == mTargetNumContainers) {
@@ -167,7 +169,7 @@ public final class ContainerAllocator {
   }
 
   private void requestContainers() throws Exception {
-    sendMessage("ContainerAllocator.requestContainers");
+    sendMessage("ContainerAllocator.requestContainers1");
     String[] hosts;
     boolean relaxLocality;
     // YARN requires that priority for relaxed-locality requests is different from strict-locality.
@@ -182,6 +184,7 @@ public final class ContainerAllocator {
       priority = Priority.newInstance(101);
     }
 
+    sendMessage("ContainerAllocator.requestContainers2");
     int numContainersToRequest = mTargetNumContainers - mAllocatedContainers.size();
     LOG.info("Requesting {} {} containers", numContainersToRequest, mContainerName);
 
@@ -190,14 +193,17 @@ public final class ContainerAllocator {
           .getMessage(numContainersToRequest, mContainerName, hosts.length));
     }
 
+    sendMessage("ContainerAllocator.requestContainers3");
     ContainerRequest containerRequest = new ContainerRequest(mResource, hosts,
         null /* any racks */, priority, relaxLocality);
     LOG.info(
         "Making {} resource request(s) for Alluxio {}s with cpu {} memory {}MB on hosts {}",
         numContainersToRequest, mContainerName,
         mResource.getVirtualCores(), mResource.getMemory(), hosts);
+    sendMessage("ContainerAllocator.requestContainers4");
     for (int i = 0; i < numContainersToRequest; i++) {
       mRMClient.addContainerRequest(containerRequest);
     }
+    sendMessage("ContainerAllocator.requestContainers5");
   }
 }

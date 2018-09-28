@@ -374,7 +374,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       List<Container> masterContainers = null;
       try{
         masterContainers = mContainerAllocator.allocateContainers();
-      }catch (Exception e){
+      }catch (Throwable e){
+        sendMessage("Throwable");
         sendMessage(e.getMessage());
       }
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.4");
