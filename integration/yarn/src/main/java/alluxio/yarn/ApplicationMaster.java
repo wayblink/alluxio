@@ -342,11 +342,15 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists");
       LOG.info("Configuring master container request.");
       Resource masterResource = Records.newRecord(Resource.class);
+      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.1");
       masterResource.setMemory(mMasterMemInMB);
       masterResource.setVirtualCores(mMasterCpu);
+      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.2");
       mContainerAllocator = new ContainerAllocator("master", 1, 1, masterResource, mYarnClient,
               mRMClient, mMasterAddress);
+      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.3");
       List<Container> masterContainers = mContainerAllocator.allocateContainers();
+      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.4");
       launchMasterContainer(Iterables.getOnlyElement(masterContainers));
     }
 
