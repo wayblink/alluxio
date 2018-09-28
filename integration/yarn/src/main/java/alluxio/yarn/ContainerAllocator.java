@@ -125,6 +125,7 @@ public final class ContainerAllocator {
    */
   public List<Container> allocateContainers() throws Exception {
     sendMessage("ContainerAllocator.allocateContainers");
+    sendMessage("ContainerAllocator.allocateContainers");
     for (int attempt = 0; attempt < MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS; attempt++) {
       sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers");
       LOG.debug("Attempt {} of {} to allocate containers",
@@ -166,6 +167,7 @@ public final class ContainerAllocator {
   }
 
   private void requestContainers() throws Exception {
+    sendMessage("ContainerAllocator.requestContainers");
     String[] hosts;
     boolean relaxLocality;
     // YARN requires that priority for relaxed-locality requests is different from strict-locality.

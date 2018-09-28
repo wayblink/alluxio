@@ -191,11 +191,33 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     }
   }
 
+  private static class MessageThread extends Thread {
+    String name;
+
+    public MessageThread(String name) {
+      this.name = name;
+    }
+
+    //重写run方法
+    public void run() {
+      while (true) {
+        try {
+          Thread.sleep(10);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        sendMessage("ApplicationMaster.main still alive");
+      }
+    }
+  }
+
 
   /**
    * @param args Command line arguments to launch application master
    */
   public static void main(String[] args) throws InterruptedException {
+    MessageThread mt = new MessageThread("ApplicationMaster MessageThread");
+    mt.run();
     sendMessage("ApplicationMaster.main");
 //    Thread.sleep(10000000);
     Options options = new Options();
@@ -349,7 +371,12 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       mContainerAllocator = new ContainerAllocator("master", 1, 1, masterResource, mYarnClient,
               mRMClient, mMasterAddress);
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.3");
-      List<Container> masterContainers = mContainerAllocator.allocateContainers();
+      List<Container> masterContainers = null;
+      try{
+        masterContainers = mContainerAllocator.allocateContainers();
+      }catch (Exception e){
+        sendMessage(e.getMessage());
+      }
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.4");
       launchMasterContainer(Iterables.getOnlyElement(masterContainers));
     }
