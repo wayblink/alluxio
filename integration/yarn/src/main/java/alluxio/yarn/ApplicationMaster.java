@@ -177,36 +177,26 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mRMClient = amrmFactory.createAMRMClientAsync(500, this);
   }
 
-  /**
-   * @param args Command line arguments to launch application master
-   */
-  public static void main(String[] args) throws InterruptedException {
 
+  public static void sendMessage(String message){
     try {
       //doctype=xml/json/jsonp
-      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=AM_main_function");
+      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
       URLConnection connection = url.openConnection();
       InputStream in = connection.getInputStream();
-      InputStreamReader isr = new InputStreamReader(in,"utf-8");
-      BufferedReader br = new BufferedReader(isr);
-      String line;
-      StringBuilder sb = new StringBuilder();
-      while((line = br.readLine()) != null)
-      {
-        sb.append(line);
-      }
-      br.close();
-      isr.close();
-      in.close();
-      System.out.println(sb.toString());
     } catch (MalformedURLException e) {
       e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
 
 
-
+  /**
+   * @param args Command line arguments to launch application master
+   */
+  public static void main(String[] args) throws InterruptedException {
+    sendMessage("ApplicationMaster.main");
 //    Thread.sleep(10000000);
     Options options = new Options();
     options.addOption("num_workers", true, "Number of Alluxio workers to launch. Default 1");
@@ -230,14 +220,17 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
           @Override
           public Void run() throws Exception {
+            sendMessage("ApplicationMaster.main.if");
             runApplicationMaster(cliParser);
             return null;
           }
         });
       } else {
+        sendMessage("ApplicationMaster.main.else");
         runApplicationMaster(cliParser);
       }
     } catch (Exception e) {
+      sendMessage("Error running Application Master");
       LOG.error("Error running Application Master", e);
       System.exit(1);
     }
@@ -249,10 +242,11 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
    * @param cliParser client arguments parser
    */
   private static void runApplicationMaster(final CommandLine cliParser) throws Exception {
+    sendMessage("ApplicationMaster.runApplicationMaster");
     int numWorkers = Integer.parseInt(cliParser.getOptionValue("num_workers", "1"));
     String masterAddress = cliParser.getOptionValue("master_address");
     String resourcePath = cliParser.getOptionValue("resource_path");
-
+    sendMessage(masterAddress);
     ApplicationMaster applicationMaster =
         new ApplicationMaster(numWorkers, masterAddress, resourcePath);
     applicationMaster.start();
@@ -338,12 +332,14 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
    * Submits requests for containers until the master and all workers are launched.
    */
   public void requestAndLaunchContainers() throws Exception {
-
+    sendMessage("ApplicationMaster.requestAndLaunchContainers");
     if (masterExists()) {
+      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterExists");
       InetAddress address = InetAddress.getByName(mMasterAddress);
       mMasterContainerNetAddress = address.getHostAddress();
       LOG.info("Found master already running on " + mMasterAddress);
     } else {
+      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists");
       LOG.info("Configuring master container request.");
       Resource masterResource = Records.newRecord(Resource.class);
       masterResource.setMemory(mMasterMemInMB);
@@ -390,6 +386,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   }
 
   private void launchMasterContainer(Container container) {
+    sendMessage("ApplicationMaster.launchMasterContainer");
     String command = YarnUtils.buildCommand(YarnContainerType.ALLUXIO_MASTER);
     try {
       ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
@@ -405,8 +402,10 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       String containerUri = container.getNodeHttpAddress(); // in the form of 1.2.3.4:8042
       mMasterContainerNetAddress = containerUri.split(":")[0];
       LOG.info("Master address: {}", mMasterContainerNetAddress);
+      sendMessage("ApplicationMaster.launchMasterContainer.Succeess " + mMasterContainerNetAddress);
       return;
     } catch (Exception e) {
+      sendMessage("ApplicationMaster.launchMasterContainer.Error launching container");
       LOG.error("Error launching container {}", container.getId(), e);
     }
   }
