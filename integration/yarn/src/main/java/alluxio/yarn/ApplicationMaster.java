@@ -173,17 +173,6 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mApplicationDoneLatch = new CountDownLatch(1);
     mYarnClient = yarnClient;
     mNMClient = nMClient;
-
-    InetAddress addr = null;
-    try {
-      addr = InetAddress.getLocalHost();
-      sendMessage("Local HostAddress: " + addr.getHostAddress());
-      String hostname = addr.getHostName();
-      sendMessage("Local host name: "+hostname);
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
-
     // Heartbeat to the resource manager every 500ms.
     mRMClient = amrmFactory.createAMRMClientAsync(500, this);
   }
@@ -208,6 +197,17 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   public static void main(String[] args) throws InterruptedException {
     sendMessage("ApplicationMaster.main");
 //    Thread.sleep(10000000);
+
+    InetAddress addr = null;
+    try {
+      addr = InetAddress.getLocalHost();
+      sendMessage("Local HostAddress: " + addr.getHostAddress());
+      String hostname = addr.getHostName();
+      sendMessage("Local host name: "+hostname);
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
+
     Options options = new Options();
     options.addOption("num_workers", true, "Number of Alluxio workers to launch. Default 1");
     options.addOption("master_address", true, "(Required) Address to run Alluxio master");
