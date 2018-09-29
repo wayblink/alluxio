@@ -205,6 +205,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       String hostname = addr.getHostName();
       sendMessage("Local host name: "+hostname);
     } catch (UnknownHostException e) {
+      sendMessage(e.getMessage());
       e.printStackTrace();
     }
 
