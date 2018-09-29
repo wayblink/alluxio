@@ -169,12 +169,14 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mMaxWorkersPerHost = Configuration.getInt(PropertyKey.INTEGRATION_YARN_WORKERS_PER_HOST_MAX);
     mNumWorkers = numWorkers;
 //    mMasterAddress = masterAddress;
+    String mMasterAddressTemp = null;
     try {
-      mMasterAddress = InetAddress.getLocalHost().getHostName();
-      sendMessage("mMasterAddress:" + mMasterAddress);
+      mMasterAddressTemp = InetAddress.getLocalHost().getHostName();
     } catch (UnknownHostException e) {
       e.printStackTrace();
     }
+    mMasterAddress = mMasterAddressTemp;
+    sendMessage("mMasterAddress:" + mMasterAddress);
     mResourcePath = resourcePath;
     mApplicationDoneLatch = new CountDownLatch(1);
     mYarnClient = yarnClient;
