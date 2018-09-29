@@ -128,7 +128,7 @@ public final class ContainerAllocator {
     sendMessage(Integer.toString(MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS));
 
     for (int attempt = 0; attempt < MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS; attempt++) {
-      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers1");
+      sendMessage("ContainerAllocator.allocateContainers.Attempt.allocate.containers1");
       LOG.debug("Attempt {} of {} to allocate containers",
           attempt, MAX_WORKER_CONTAINER_REQUEST_ATTEMPTS);
       int numContainersToRequest = mTargetNumContainers - mAllocatedContainerHosts.size();
