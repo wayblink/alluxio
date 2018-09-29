@@ -173,6 +173,17 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mApplicationDoneLatch = new CountDownLatch(1);
     mYarnClient = yarnClient;
     mNMClient = nMClient;
+
+    InetAddress addr = null;
+    try {
+      addr = InetAddress.getLocalHost();
+      sendMessage("Local HostAddress: " + addr.getHostAddress());
+      String hostname = addr.getHostName();
+      sendMessage("Local host name: "+hostname);
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
+
     // Heartbeat to the resource manager every 500ms.
     mRMClient = amrmFactory.createAMRMClientAsync(500, this);
   }

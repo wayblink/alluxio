@@ -135,9 +135,7 @@ public final class ContainerAllocator {
       sendMessage(Integer.toString(numContainersToRequest));
       LOG.debug("Requesting {} containers", numContainersToRequest);
       mOutstandingContainerRequestsLatch = new CountDownLatch(numContainersToRequest);
-      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers2");
       requestContainers();
-      sendMessage("ContainerAllocator.allocateContainers.Attempt allocate containers3");
       // Wait for all outstanding requests to be responded to before beginning the next round.
       mOutstandingContainerRequestsLatch.await();
       if (mAllocatedContainerHosts.size() == mTargetNumContainers) {
