@@ -168,7 +168,13 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mRamdiskMemInMB = (int) (Configuration.getBytes(PropertyKey.WORKER_MEMORY_SIZE) / Constants.MB);
     mMaxWorkersPerHost = Configuration.getInt(PropertyKey.INTEGRATION_YARN_WORKERS_PER_HOST_MAX);
     mNumWorkers = numWorkers;
-    mMasterAddress = masterAddress;
+//    mMasterAddress = masterAddress;
+    try {
+      mMasterAddress = InetAddress.getLocalHost().getHostName();
+      sendMessage("mMasterAddress:" + mMasterAddress);
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    }
     mResourcePath = resourcePath;
     mApplicationDoneLatch = new CountDownLatch(1);
     mYarnClient = yarnClient;
@@ -198,16 +204,16 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     sendMessage("ApplicationMaster.main");
 //    Thread.sleep(10000000);
 
-    InetAddress addr = null;
-    try {
-      addr = InetAddress.getLocalHost();
-      sendMessage("Local.HostAddress:" + addr.getHostAddress());
-      String hostname = addr.getHostName();
-      sendMessage("Local.host.name:"+hostname);
-    } catch (UnknownHostException e) {
-      sendMessage(e.getMessage());
-      e.printStackTrace();
-    }
+//    InetAddress addr = null;
+//    try {
+//      addr = InetAddress.getLocalHost();
+//      sendMessage("Local.HostAddress:" + addr.getHostAddress());
+//      String hostname = addr.getHostName();
+//      sendMessage("Local.host.name:"+hostname);
+//    } catch (UnknownHostException e) {
+//      sendMessage(e.getMessage());
+//      e.printStackTrace();
+//    }
 
     Options options = new Options();
     options.addOption("num_workers", true, "Number of Alluxio workers to launch. Default 1");
