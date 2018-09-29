@@ -203,6 +203,9 @@ public final class ContainerAllocator {
         numContainersToRequest, mContainerName,
         mResource.getVirtualCores(), mResource.getMemory(), hosts);
     sendMessage("ContainerAllocator.requestContainers4");
+
+    Thread.sleep(100000);
+
     for (int i = 0; i < numContainersToRequest; i++) {
       mRMClient.addContainerRequest(containerRequest);
     }
