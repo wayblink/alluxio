@@ -49,10 +49,8 @@ import org.apache.hadoop.yarn.util.Records;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
@@ -386,7 +384,12 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mContainerAllocator = new ContainerAllocator("worker", mNumWorkers, mMaxWorkersPerHost,
         workerResource, mYarnClient, mRMClient);
     List<Container> workerContainers = mContainerAllocator.allocateContainers();
-    for (Container container : workerContainers) {
+
+    sendMessage("ApplicationMaster.workerContainers.size:" + Integer.toString(workerContainers.size()));
+
+    for (int i = 0 ;i < workerContainers.size(); i++){
+      Container container = workerContainers.get(i);
+      sendMessage("ApplicationMaster.launchWorkerContainer:" + Integer.toString(i));
       launchWorkerContainer(container);
     }
     LOG.info("Master and workers are launched");
@@ -441,6 +444,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   }
 
   private void launchWorkerContainer(Container container) {
+    sendMessage("ApplicationMaster.launchWorkerContainer");
     String command = YarnUtils.buildCommand(YarnContainerType.ALLUXIO_WORKER);
 
     ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
