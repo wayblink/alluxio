@@ -351,7 +351,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   /**
    * Submits requests for containers until the master and all workers are launched.
    */
-  public void ALLUXIO_HOME() throws Exception {
+  public void requestAndLaunchContainers() throws Exception {
     sendMessage("ApplicationMaster.requestAndLaunchContainers");
     if (masterExists()) {
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterExists");
