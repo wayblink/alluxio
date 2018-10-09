@@ -168,15 +168,15 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mRamdiskMemInMB = (int) (Configuration.getBytes(PropertyKey.WORKER_MEMORY_SIZE) / Constants.MB);
     mMaxWorkersPerHost = Configuration.getInt(PropertyKey.INTEGRATION_YARN_WORKERS_PER_HOST_MAX);
     mNumWorkers = numWorkers;
-//    mMasterAddress = masterAddress;
-    String mMasterAddressTemp = null;
-    try {
-      mMasterAddressTemp = InetAddress.getLocalHost().getHostName();
-    } catch (UnknownHostException e) {
-      e.printStackTrace();
-    }
-    mMasterAddress = mMasterAddressTemp;
-    sendMessage("mMasterAddress:" + mMasterAddress);
+    mMasterAddress = masterAddress;
+//    String mMasterAddressTemp = null;
+//    try {
+//      mMasterAddressTemp = InetAddress.getLocalHost().getHostName();
+//    } catch (UnknownHostException e) {
+//      e.printStackTrace();
+//    }
+//    mMasterAddress = mMasterAddressTemp;
+//    sendMessage("mMasterAddress:" + mMasterAddress);
     mResourcePath = resourcePath;
     mApplicationDoneLatch = new CountDownLatch(1);
     mYarnClient = yarnClient;
@@ -351,7 +351,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   /**
    * Submits requests for containers until the master and all workers are launched.
    */
-  public void requestAndLaunchContainers() throws Exception {
+  public void ALLUXIO_HOME() throws Exception {
     sendMessage("ApplicationMaster.requestAndLaunchContainers");
     if (masterExists()) {
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterExists");
