@@ -184,24 +184,24 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   }
 
 
-  public static void sendMessage(String message){
-    try {
-      //doctype=xml/json/jsonp
-      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
-      URLConnection connection = url.openConnection();
-      InputStream in = connection.getInputStream();
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
+//  public static void sendMessage(String message){
+//    try {
+//      //doctype=xml/json/jsonp
+//      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
+//      URLConnection connection = url.openConnection();
+//      InputStream in = connection.getInputStream();
+//    } catch (MalformedURLException e) {
+//      e.printStackTrace();
+//    } catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//  }
 
   /**
    * @param args Command line arguments to launch application master
    */
   public static void main(String[] args) throws InterruptedException {
-    sendMessage("ApplicationMaster.main");
+//    sendMessage("ApplicationMaster.main");
 //    Thread.sleep(10000000);
 
 //    InetAddress addr = null;
@@ -237,17 +237,14 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
         ugi.doAs(new PrivilegedExceptionAction<Void>() {
           @Override
           public Void run() throws Exception {
-            sendMessage("ApplicationMaster.main.if");
             runApplicationMaster(cliParser);
             return null;
           }
         });
       } else {
-        sendMessage("ApplicationMaster.main.else");
         runApplicationMaster(cliParser);
       }
     } catch (Exception e) {
-      sendMessage("Error running Application Master");
       LOG.error("Error running Application Master", e);
       System.exit(1);
     }
@@ -360,21 +357,12 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists");
       LOG.info("Configuring master container request.");
       Resource masterResource = Records.newRecord(Resource.class);
-      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.1");
       masterResource.setMemory(mMasterMemInMB);
       masterResource.setVirtualCores(mMasterCpu);
-      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.2");
       mContainerAllocator = new ContainerAllocator("master", 1, 1, masterResource, mYarnClient,
               mRMClient, mMasterAddress);
-      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.3");
       List<Container> masterContainers = null;
-      try{
-        masterContainers = mContainerAllocator.allocateContainers();
-      }catch (Throwable e){
-        sendMessage("Throwable");
-        sendMessage(e.getMessage());
-      }
-      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists.4");
+      masterContainers = mContainerAllocator.allocateContainers();
       launchMasterContainer(Iterables.getOnlyElement(masterContainers));
     }
 
@@ -384,12 +372,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mContainerAllocator = new ContainerAllocator("worker", mNumWorkers, mMaxWorkersPerHost,
         workerResource, mYarnClient, mRMClient);
     List<Container> workerContainers = mContainerAllocator.allocateContainers();
-
-    sendMessage("ApplicationMaster.workerContainers.size:" + Integer.toString(workerContainers.size()));
-
     for (int i = 0 ;i < workerContainers.size(); i++){
       Container container = workerContainers.get(i);
-      sendMessage("ApplicationMaster.launchWorkerContainer:" + Integer.toString(i));
       launchWorkerContainer(container);
     }
     sendMessage("Master and workers are launched");

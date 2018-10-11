@@ -224,10 +224,7 @@ public final class Client {
       Log.info(args[i]);
     }
     Preconditions.checkArgument(args.length > 0, "No args specified for client to initialize");
-    Log.info("flag0");
     CommandLine cliParser = new GnuParser().parse(mOptions, args);
-
-    Log.info("flag1");
 
     if (cliParser.hasOption("help")) {
       printUsage();
@@ -239,8 +236,6 @@ public final class Client {
       return false;
     }
 
-    Log.info("flag2");
-
     mResourcePath = cliParser.getOptionValue("resource_path");
     mMasterAddress = cliParser.getOptionValue("master_address");
     mAppName = cliParser.getOptionValue("appname", "alluxio_" + System.currentTimeMillis() +"_wanganyang");
@@ -251,17 +246,12 @@ public final class Client {
     mNumWorkers = Integer.parseInt(cliParser.getOptionValue("num_workers", "1"));
     mMaxWorkersPerHost =
         Configuration.getInt(PropertyKey.INTEGRATION_YARN_WORKERS_PER_HOST_MAX);
-
-    Log.info("flag3");
-
     Preconditions.checkArgument(mAmMemoryInMB > 0,
         "Invalid memory specified for application master, " + "exiting. Specified memory="
             + mAmMemoryInMB);
     Preconditions.checkArgument(mAmVCores > 0,
         "Invalid virtual cores specified for application master, exiting."
             + " Specified virtual cores=" + mAmVCores);
-
-    Log.info("flag4");
     return true;
   }
 
