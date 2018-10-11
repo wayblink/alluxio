@@ -184,25 +184,24 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   }
 
 
-//  public static void sendMessage(String message){
-//    try {
-//      //doctype=xml/json/jsonp
-//      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
-//      URLConnection connection = url.openConnection();
-//      InputStream in = connection.getInputStream();
-//    } catch (MalformedURLException e) {
-//      e.printStackTrace();
-//    } catch (IOException e) {
-//      e.printStackTrace();
-//    }
-//  }
+  public static void sendMessage(String message){
+    try {
+      //doctype=xml/json/jsonp
+      URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
+      URLConnection connection = url.openConnection();
+      InputStream in = connection.getInputStream();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
 
   /**
    * @param args Command line arguments to launch application master
    */
   public static void main(String[] args) throws InterruptedException {
-//    sendMessage("ApplicationMaster.main");
-//    Thread.sleep(10000000);
+    sendMessage("ApplicationMaster.main");
 
 //    InetAddress addr = null;
 //    try {
