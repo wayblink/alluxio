@@ -392,6 +392,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       sendMessage("ApplicationMaster.launchWorkerContainer:" + Integer.toString(i));
       launchWorkerContainer(container);
     }
+    sendMessage("Master and workers are launched");
     LOG.info("Master and workers are launched");
   }
 

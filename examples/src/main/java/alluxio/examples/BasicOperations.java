@@ -97,4 +97,10 @@ public class BasicOperations implements Callable<Boolean> {
     LOG.info(FormatUtils.formatTimeTakenMs(startTimeMs, "readFile file " + mFilePath));
     return pass;
   }
+
+  public static void main(String[] args){
+
+
+
+  }
 }

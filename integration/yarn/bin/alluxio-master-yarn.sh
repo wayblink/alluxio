@@ -15,7 +15,9 @@ source "${SCRIPT_DIR}/common.sh"
 ALLUXIO_MASTER_JAVA_OPTS="${ALLUXIO_MASTER_JAVA_OPTS:-${ALLUXIO_JAVA_OPTS}}"
 
 # Yarn will set LOG_DIRS to point to the Yarn application log directory
-YARN_LOG_DIR="$LOG_DIRS"
+#YARN_LOG_DIR="$LOG_DIRS"
+YARN_LOG_DIR=$ALLUXIO_HOME/logs
+mkdir $YARN_LOG_DIR
 
 echo "Formatting Alluxio Master"
 

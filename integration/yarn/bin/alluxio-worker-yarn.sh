@@ -19,7 +19,9 @@ echo "Mounting ramdisk of ${ALLUXIO_WORKER_MEMORY_SIZE} MB on Worker"
 ${ALLUXIO_HOME}/bin/alluxio-mount.sh SudoMount
 
 # Yarn will set LOG_DIRS to point to the Yarn application log directory
-YARN_LOG_DIR="$LOG_DIRS"
+#YARN_LOG_DIR="$LOG_DIRS"
+YARN_LOG_DIR=$ALLUXIO_HOME/logs
+mkdir $YARN_LOG_DIR
 
 echo "Formatting Alluxio Worker"
 

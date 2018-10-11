@@ -30,7 +30,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -108,6 +110,7 @@ public final class ContainerAllocator {
   public static void sendMessage(String message){
     try {
       //doctype=xml/json/jsonp
+
       URL url = new URL("http://10.8.46.221:9334/api/v1/message?message=" + message);
       URLConnection connection = url.openConnection();
       InputStream in = connection.getInputStream();
@@ -142,7 +145,6 @@ public final class ContainerAllocator {
         break;
       }
     }
-    sendMessage("ContainerAllocator.allocateContainers.afterfor");
     sendMessage("ContainerAllocator.allocateContainers" + mAllocatedContainers.size());
     if (mAllocatedContainers.size() != mTargetNumContainers) {
       sendMessage("ContainerAllocator.allocateContainers.throw");
@@ -170,7 +172,6 @@ public final class ContainerAllocator {
   }
 
   private void requestContainers() throws Exception {
-    sendMessage("ContainerAllocator.requestContainers1");
     sendMessage(Long.toString(mOutstandingContainerRequestsLatch.getCount()));
     String[] hosts;
     boolean relaxLocality;
@@ -185,8 +186,6 @@ public final class ContainerAllocator {
       relaxLocality = true;
       priority = Priority.newInstance(101);
     }
-
-    sendMessage("ContainerAllocator.requestContainers2");
     int numContainersToRequest = mTargetNumContainers - mAllocatedContainers.size();
     LOG.info("Requesting {} {} containers", numContainersToRequest, mContainerName);
 
@@ -194,22 +193,14 @@ public final class ContainerAllocator {
       throw new RuntimeException(ExceptionMessage.YARN_NOT_ENOUGH_HOSTS
           .getMessage(numContainersToRequest, mContainerName, hosts.length));
     }
-
-    sendMessage("ContainerAllocator.requestContainers3");
     ContainerRequest containerRequest = new ContainerRequest(mResource, hosts,
         null /* any racks */, priority, relaxLocality);
     LOG.info(
         "Making {} resource request(s) for Alluxio {}s with cpu {} memory {}MB on hosts {}",
         numContainersToRequest, mContainerName,
         mResource.getVirtualCores(), mResource.getMemory(), hosts);
-    sendMessage("ContainerAllocator.requestContainers4");
-
-//    Thread.sleep(100000);
-
     for (int i = 0; i < numContainersToRequest; i++) {
       mRMClient.addContainerRequest(containerRequest);
     }
-    sendMessage("ContainerAllocator.requestContainers5");
-    sendMessage(Long.toString(mOutstandingContainerRequestsLatch.getCount()));
   }
 }

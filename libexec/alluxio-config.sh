@@ -36,7 +36,7 @@ ALLUXIO_LOGS_DIR="${ALLUXIO_LOGS_DIR:-${ALLUXIO_HOME}/logs}"
 
 if [[ -z "$(which java)" ]]; then
   echo "Cannot find the 'java' command."
-  exit 1
+  #exit 1
 fi
 
 JAVA_HOME=${JAVA_HOME:-"$(dirname $(which java))/.."}
