@@ -106,6 +106,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
 
   private volatile ContainerAllocator mContainerAllocator;
 
+  private volatile int mCurrentNumWorkers;
+
   /**
    * A factory which creates an AMRMClientAsync with a heartbeat interval and callback handler.
    */
@@ -167,20 +169,13 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     mMaxWorkersPerHost = Configuration.getInt(PropertyKey.INTEGRATION_YARN_WORKERS_PER_HOST_MAX);
     mNumWorkers = numWorkers;
     mMasterAddress = masterAddress;
-//    String mMasterAddressTemp = null;
-//    try {
-//      mMasterAddressTemp = InetAddress.getLocalHost().getHostName();
-//    } catch (UnknownHostException e) {
-//      e.printStackTrace();
-//    }
-//    mMasterAddress = mMasterAddressTemp;
-//    sendMessage("mMasterAddress:" + mMasterAddress);
     mResourcePath = resourcePath;
     mApplicationDoneLatch = new CountDownLatch(1);
     mYarnClient = yarnClient;
     mNMClient = nMClient;
     // Heartbeat to the resource manager every 500ms.
     mRMClient = amrmFactory.createAMRMClientAsync(500, this);
+    mCurrentNumWorkers = 0;
   }
 
 
@@ -202,18 +197,6 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
    */
   public static void main(String[] args) throws InterruptedException {
     sendMessage("ApplicationMaster.main");
-
-//    InetAddress addr = null;
-//    try {
-//      addr = InetAddress.getLocalHost();
-//      sendMessage("Local.HostAddress:" + addr.getHostAddress());
-//      String hostname = addr.getHostName();
-//      sendMessage("Local.host.name:"+hostname);
-//    } catch (UnknownHostException e) {
-//      sendMessage(e.getMessage());
-//      e.printStackTrace();
-//    }
-
     Options options = new Options();
     options.addOption("num_workers", true, "Number of Alluxio workers to launch. Default 1");
     options.addOption("master_address", true, "(Required) Address to run Alluxio master");
@@ -268,6 +251,44 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     applicationMaster.stop();
   }
 
+  private class WorkerRequestDaemon implements Runnable{
+
+    private ApplicationMaster applicationMaster;
+    private WorkerRequestDaemon(ApplicationMaster applicationMaster){
+      this.applicationMaster = applicationMaster;
+    }
+
+    @Override
+    public void run() {
+      try {
+        while(true){
+          Thread.sleep(30000);
+          LOG.info("Current workers num: " + mCurrentNumWorkers);
+          if(mCurrentNumWorkers < mNumWorkers){
+            requestWorker(mNumWorkers - mCurrentNumWorkers);
+          }
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+  }
+
+  private void requestWorker(int requestWorkerNum) throws Exception {
+    LOG.info("request " + requestWorkerNum + " workers");
+    Resource workerResource = Records.newRecord(Resource.class);
+    workerResource.setMemory(mWorkerMemInMB + mRamdiskMemInMB);
+    workerResource.setVirtualCores(mWorkerCpu);
+    mContainerAllocator = new ContainerAllocator("worker", requestWorkerNum, mMaxWorkersPerHost,
+            workerResource, mYarnClient, mRMClient);
+    List<Container> workerContainers = mContainerAllocator.allocateContainers();
+    for (int i = 0 ;i < workerContainers.size(); i++){
+      Container container = workerContainers.get(i);
+      launchWorkerContainer(container);
+    }
+  }
+
+
   @Override
   public void onContainersAllocated(List<Container> containers) {
     sendMessage("ApplicationMaster.onContainersAllocated");
@@ -286,6 +307,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       } else {
         LOG.error("Container {} completed with exit status {}", status.getContainerId(),
             status.getExitStatus());
+        mCurrentNumWorkers--;
       }
     }
   }
@@ -346,14 +368,11 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
    * Submits requests for containers until the master and all workers are launched.
    */
   public void requestAndLaunchContainers() throws Exception {
-    sendMessage("ApplicationMaster.requestAndLaunchContainers");
     if (masterExists()) {
-      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterExists");
       InetAddress address = InetAddress.getByName(mMasterAddress);
       mMasterContainerNetAddress = address.getHostAddress();
       LOG.info("Found master already running on " + mMasterAddress);
     } else {
-      sendMessage("ApplicationMaster.requestAndLaunchContainers.masterNotExists");
       LOG.info("Configuring master container request.");
       Resource masterResource = Records.newRecord(Resource.class);
       masterResource.setMemory(mMasterMemInMB);
@@ -375,8 +394,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       Container container = workerContainers.get(i);
       launchWorkerContainer(container);
     }
-    sendMessage("Master and workers are launched");
     LOG.info("Master and workers are launched");
+    LOG.info("Master host address: " + mMasterAddress);
   }
 
   /**
@@ -403,7 +422,6 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
   }
 
   private void launchMasterContainer(Container container) {
-    sendMessage("ApplicationMaster.launchMasterContainer");
     String command = YarnUtils.buildCommand(YarnContainerType.ALLUXIO_MASTER);
     try {
       ContainerLaunchContext ctx = Records.newRecord(ContainerLaunchContext.class);
@@ -419,10 +437,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       String containerUri = container.getNodeHttpAddress(); // in the form of 1.2.3.4:8042
       mMasterContainerNetAddress = containerUri.split(":")[0];
       LOG.info("Master address: {}", mMasterContainerNetAddress);
-      sendMessage("ApplicationMaster.launchMasterContainer.Succeess " + mMasterContainerNetAddress);
       return;
     } catch (Exception e) {
-      sendMessage("ApplicationMaster.launchMasterContainer.Error launching container");
       LOG.error("Error launching container {}", container.getId(), e);
     }
   }
@@ -443,6 +459,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
       LOG.info("Launching container {} for Alluxio worker on {} with worker command: {}",
           container.getId(), container.getNodeHttpAddress(), command);
       mNMClient.startContainer(container, ctx);
+      mCurrentNumWorkers++;
     } catch (Exception e) {
       LOG.error("Error launching container {}", container.getId(), e);
     }
