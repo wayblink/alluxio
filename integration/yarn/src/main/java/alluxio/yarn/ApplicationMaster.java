@@ -230,11 +230,13 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
         new ApplicationMaster(numWorkers, masterAddress, resourcePath);
     applicationMaster.start();
     applicationMaster.requestAndLaunchContainers();
+    WorkerRequestDaemon daemon = new WorkerRequestDaemon(applicationMaster);
+    daemon.run();
     applicationMaster.waitForShutdown();
     applicationMaster.stop();
   }
 
-  private class WorkerRequestDaemon implements Runnable{
+  private static class WorkerRequestDaemon implements Runnable{
 
     private ApplicationMaster applicationMaster;
     private WorkerRequestDaemon(ApplicationMaster applicationMaster){
@@ -245,7 +247,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     public void run() {
       try {
         while(true){
-          Thread.sleep(30000);
+          Thread.sleep(10000);
           LOG.info("Current workers num: " + mCurrentNumWorkers);
           if(mCurrentNumWorkers < mNumWorkers){
             requestWorker(mNumWorkers - mCurrentNumWorkers);
