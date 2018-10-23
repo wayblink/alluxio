@@ -108,6 +108,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
 
   private volatile int mCurrentNumWorkers;
 
+  private WorkerRequestDaemon mWorkerRequestDaemon;
+
   /**
    * A factory which creates an AMRMClientAsync with a heartbeat interval and callback handler.
    */
@@ -176,6 +178,7 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
     // Heartbeat to the resource manager every 500ms.
     mRMClient = amrmFactory.createAMRMClientAsync(500, this);
     mCurrentNumWorkers = 0;
+    mWorkerRequestDaemon = new WorkerRequestDaemon(this);
   }
 
   /**
@@ -230,13 +233,12 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
         new ApplicationMaster(numWorkers, masterAddress, resourcePath);
     applicationMaster.start();
     applicationMaster.requestAndLaunchContainers();
-    WorkerRequestDaemon daemon = new WorkerRequestDaemon(applicationMaster);
-    daemon.run();
+    applicationMaster.mWorkerRequestDaemon.run();
     applicationMaster.waitForShutdown();
     applicationMaster.stop();
   }
 
-  private static class WorkerRequestDaemon implements Runnable{
+  private class WorkerRequestDaemon implements Runnable{
 
     private ApplicationMaster applicationMaster;
     private WorkerRequestDaemon(ApplicationMaster applicationMaster){
@@ -249,8 +251,8 @@ public final class ApplicationMaster implements AMRMClientAsync.CallbackHandler 
         while(true){
           Thread.sleep(10000);
           LOG.info("Current workers num: " + mCurrentNumWorkers);
-          if(mCurrentNumWorkers < mNumWorkers){
-            requestWorker(mNumWorkers - mCurrentNumWorkers);
+          if(mCurrentNumWorkers < applicationMaster.mNumWorkers){
+            requestWorker(applicationMaster.mNumWorkers - mCurrentNumWorkers);
           }
         }
       } catch (Exception e) {
