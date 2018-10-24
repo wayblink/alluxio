@@ -123,6 +123,7 @@ public final class Client {
   /** Command line options. */
   private Options mOptions;
 
+
   /**
    * Constructs a new client for launching an Alluxio application master.
    */
