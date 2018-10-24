@@ -1304,7 +1304,7 @@
         <module>integration/mesos</module>
       </modules>
       <properties>
-        <hadoop.version>2.6.0</hadoop.version>
+        <hadoop.version>2.6.0-cdh5.4.4-bd3</hadoop.version>
       </properties>
     </profile>
 
