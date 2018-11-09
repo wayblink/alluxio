@@ -2371,7 +2371,7 @@ public final class PropertyKey implements Comparable<PropertyKey> {
           .build();
   public static final PropertyKey USER_FILE_PASSIVE_CACHE_ENABLED =
       new Builder(Name.USER_FILE_PASSIVE_CACHE_ENABLED)
-          .setDefaultValue(true)
+          .setDefaultValue(false)
           .setDescription("Whether to cache files to local Alluxio workers when the files are read "
               + "from remote workers (not UFS).")
           .setConsistencyCheckLevel(ConsistencyCheckLevel.WARN)

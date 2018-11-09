@@ -30,6 +30,7 @@ import alluxio.retry.CountingRetry;
 import alluxio.util.proto.ProtoMessage;
 import alluxio.wire.WorkerNetAddress;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
@@ -37,9 +38,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ConnectException;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.*;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -291,6 +292,58 @@ public class FileInStream extends InputStream implements BoundedStream, Position
     mBlockInStream.seek(offset);
   }
 
+  //服务发现
+  public static URI getServiceAddress(String consulName) throws Exception {
+    try {
+      URL managerUr = new URL("http://127.0.0.1:2280/v1/lookup/name?name=" + consulName);
+      HttpURLConnection connection = (HttpURLConnection) managerUr.openConnection();
+      connection.setDoInput(true);
+      connection.setDoOutput(true);
+      connection.setUseCaches(false);
+      connection.setInstanceFollowRedirects(true);
+      connection.setRequestMethod("GET");
+
+      ObjectMapper mapper = new ObjectMapper();
+      List<Map<String, Object>> list = mapper.readValue(connection.getInputStream(), List.class);
+
+      if (list != null && list.size() > 0) {
+        Collections.shuffle(list, new Random(System.currentTimeMillis()));
+        Map<String, Object> map = list.get(0);
+        String host = (String) map.get("Host");
+        int port = (Integer) map.get("Port");
+        String s = "thrift://" + host + ":" + port;
+        URI tmpUri = new URI(s);
+        if (tmpUri.getScheme() == null) {
+          throw new IllegalArgumentException("URI: " + s
+                  + " does not have a scheme");
+        }
+        return tmpUri;
+      }
+      throw new NullPointerException();
+    } catch (Exception e) {
+      throw e;
+    }
+  }
+
+  //发送日志到独立部署的收集器，用于追查问题
+  public static void sendLog(String log){
+    try {
+      SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd-HH:mm:ss");//设置日期格式
+      String date = df.format(new Date());
+      URI logServerUri = getServiceAddress("data.olap.message_collector");
+      String logApi = "http://" + logServerUri.getHost() + ":" + logServerUri.getPort() + "/api/v1/message?message=";
+      URL url = new URL((logApi + date + "-" + log).replaceAll(" ","__"));
+      URLConnection connection = url.openConnection();
+      InputStream in = connection.getInputStream();
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
   private void closeBlockInStream(BlockInStream stream) throws IOException {
     if (stream != null) {
       // Get relevant information from the stream.
@@ -309,6 +362,8 @@ public class FileInStream extends InputStream implements BoundedStream, Position
       // Send an async cache request to a worker based on read type and passive cache options.
       boolean cache = mOptions.getOptions().getReadType().isCache();
       boolean passiveCache = Configuration.getBoolean(PropertyKey.USER_FILE_PASSIVE_CACHE_ENABLED);
+      sendLog(String.valueOf(passiveCache));
+
       long channelTimeout = Configuration.getMs(PropertyKey.USER_NETWORK_NETTY_TIMEOUT_MS);
       if (cache) {
         WorkerNetAddress worker;
