@@ -185,7 +185,8 @@ func addAdditionalFiles(srcPath, dstPath string, hadoopVersion version, version 
 			"integration/yarn/bin/alluxio-yarn-setup.sh",
 			"integration/yarn/bin/common.sh",
 			"integration/yarn/bin/run_tce.sh",
-			"integration/yarn/bin/run_local.sh",
+			"integration/yarn/bin/run_default.sh",
+			"integration/yarn/bin/run_oryx.sh",
 		}...)
 	}
 	for _, path := range pathsToCopy {
