@@ -25,7 +25,7 @@ function printUsage {
   echo "Example: ./alluxio-yarn.sh 10 hdfs://localhost:9000/tmp/ any"
 }
 
-if [[ "$#" -lt 2 ]] || [[ "$#" -gt 3 ]]; then
+if [[ "$#" -lt 2 ]] || [[ "$#" -gt 6 ]]; then
   printUsage
   exit 1
 fi
@@ -47,10 +47,16 @@ ALLUXIO_HOME="$(cd "${SCRIPT_DIR}/../../.."; pwd)"
 
 source "${SCRIPT_DIR}/common.sh"
 
+ALLUXIO_APP_NAME=alluxio_wanganyang
+QUEUE_NAME=root.data.etl
+
 NUM_WORKERS=$1
 HDFS_PATH=$2
 MASTER_ADDRESS=${3:-${ALLUXIO_MASTER_HOSTNAME}}
 APP_NAME=${4:-${ALLUXIO_APP_NAME}}
+QUEUE_NAME=${5:-${QUEUE_NAME}}
+PRIORITY=${6:-3}
+
 
 ALLUXIO_TARFILE="alluxio.tar.gz"
 rm -rf $ALLUXIO_TARFILE
@@ -84,4 +90,6 @@ ${YARN_HOME}/bin/yarn jar ${JAR_LOCAL} alluxio.yarn.Client \
     -num_workers ${NUM_WORKERS} \
     -master_address ${MASTER_ADDRESS} \
     -resource_path ${HDFS_PATH} \
-    -appname alluxio_wanganyang
+    -appname ${APP_NAME} \
+    -queue ${QUEUE_NAME} \
+    -priority ${PRIORITY}
