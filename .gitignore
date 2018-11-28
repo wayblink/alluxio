@@ -47,3 +47,5 @@
 dependency-reduced-pom.xml
 target/
 tests.log*
+output/
+alluxio-1.8.0-hadoop-2.6*
